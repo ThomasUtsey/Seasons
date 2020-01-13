@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import SeasonDisplay from './SeasonDisplay'
+import Spinner from './spinner'
+import './app.css'
+class App extends React.Component{
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  state = {
+      lat:null,
+      err:''
+  }
+
+  componentDidMount(){
+
+    window.navigator.geolocation.getCurrentPosition(
+        (position) => this.setState({lat:position.coords.latitude}),
+        (err) => this.setState({err:err.message})
+    )
+
+  }
+
+  componentDidUpdate(){
+    console.log('component did update')
+  }
+
+  renderContent = () =>{
+    if(this.state.lat){
+      return(<div>
+       <SeasonDisplay
+      lat = {this.state.lat}
+      />
+       </div>)
+    }else if(this.state.err !== ''){
+      return <Spinner
+                message ={'Permision to retrieve location has been denied please authorize location retrieval by refreshing the page and selecting allow in the prompt'} 
+      />
+    }else{
+      return <Spinner
+              message = {'Awaiting permision to retrieve your location'}
+      />
+    }
+  }
+
+  render(){
+    return(
+      <div>{this.renderContent()}</div>
+    )
+   
+  }
 }
 
-export default App;
+export default App
